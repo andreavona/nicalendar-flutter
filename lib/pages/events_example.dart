@@ -119,15 +119,7 @@ class _TableEventsExampleState extends State<TableEventsExample> {
               _focusedDay = focusedDay;
             },
           ),
-          const SizedBox(height: 8.0),
-          FloatingActionButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => MyCustomForm()),
-            ),
-            backgroundColor: Colors.blue,
-            child: const Icon(Icons.add),
-          ),
+          SelectionButton(), // pulsante aggiungi eventi
           Expanded(
             child: ValueListenableBuilder<List<Event>>(
               valueListenable: _selectedEvents,
@@ -157,5 +149,54 @@ class _TableEventsExampleState extends State<TableEventsExample> {
         ],
       ),
     );
+  }
+}
+
+class SelectionButton extends StatefulWidget {
+  const SelectionButton({super.key});
+
+  @override
+  State<SelectionButton> createState() => _SelectionButtonState();
+}
+
+class _SelectionButtonState extends State<SelectionButton> {
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () {
+        _navigateAndDisplaySelection(context);
+      },
+      backgroundColor: Colors.blue,
+      child: const Icon(Icons.add),
+    );
+    /* 
+    return ElevatedButton(
+      onPressed: () {
+        _navigateAndDisplaySelection(context);
+      },
+      child: const Text('Pick an option, any option!'),
+    );
+    */
+  }
+
+// A method that launches the SelectionScreen and awaits the result from
+// Navigator.pop.
+  Future<void> _navigateAndDisplaySelection(BuildContext context) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MyCustomForm()),
+    );
+
+    // When a BuildContext is used from a StatefulWidget, the mounted property
+    // must be checked after an asynchronous gap.
+    if (!mounted) return;
+
+    // After the Selection Screen returns a result, hide any previous snackbars
+    // and show the new result.
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('$result')));
   }
 }
