@@ -3,16 +3,36 @@
 
 import 'dart:collection';
 
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 /// Example event class.
 class Event {
-  final String title;
+  String nomePaziente;
+  String azione;
+  DateTime data;
+  String fasciaOraria;
+  String altro;
 
-  const Event(this.title);
+  Event(
+      {required this.nomePaziente,
+      required this.azione,
+      required this.data,
+      required this.fasciaOraria,
+      required this.altro});
+
+  dynamic toJson() => {
+        'Nome Paziente': nomePaziente,
+        'azione': azione,
+        'data': DateFormat.yMd().format(data),
+        'Fascia Oraria': fasciaOraria,
+        'Altro': altro
+      };
 
   @override
-  String toString() => title;
+  String toString() {
+    return toJson().toString();
+  }
 }
 
 /// Example events.

@@ -13,7 +13,7 @@ class TableEventsExample extends StatefulWidget {
 }
 
 class _TableEventsExampleState extends State<TableEventsExample> {
-  late final ValueNotifier<List<Event>> _selectedEvents;
+  late ValueNotifier<List<Event>> _selectedEvents;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
       .toggledOff; // Can be toggled on/off by longpressing a date
@@ -195,8 +195,10 @@ class _SelectionButtonState extends State<SelectionButton> {
 
     // After the Selection Screen returns a result, hide any previous snackbars
     // and show the new result.
-    ScaffoldMessenger.of(context)
-      ..removeCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('$result')));
+    if (result != null) {
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text('$result')));
+    }
   }
 }
