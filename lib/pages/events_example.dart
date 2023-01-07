@@ -169,14 +169,6 @@ class _SelectionButtonState extends State<SelectionButton> {
       backgroundColor: Colors.blue,
       child: const Icon(Icons.add),
     );
-    /* 
-    return ElevatedButton(
-      onPressed: () {
-        _navigateAndDisplaySelection(context);
-      },
-      child: const Text('Pick an option, any option!'),
-    );
-    */
   }
 
 // A method that launches the SelectionScreen and awaits the result from
@@ -196,6 +188,12 @@ class _SelectionButtonState extends State<SelectionButton> {
     // After the Selection Screen returns a result, hide any previous snackbars
     // and show the new result.
     if (result != null) {
+      //kEvents[result.data] = result;
+      if (kEvents[result.data] == null) {
+        final growableList = <Event>[];
+        kEvents[result.data] = growableList;
+      }
+      kEvents[result.data]!.add(result);
       ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text('$result')));

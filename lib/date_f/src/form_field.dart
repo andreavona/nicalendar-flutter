@@ -1,6 +1,8 @@
-import 'package:date_field/src/field.dart';
+//import 'package:date_field/src/field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import 'field.dart';
 
 /// A [FormField] that contains a [DateTimeField].
 ///
@@ -60,7 +62,7 @@ class DateTimeFormField extends FormField<DateTime> {
               lastDate: lastDate,
               decoration: effectiveDecoration,
               initialDatePickerMode: initialDatePickerMode,
-              dateFormat: DateFormat.yMd().add_Hm(), //DateFormat.yMd()
+              dateFormat: DateFormat.yMd(), //DateFormat.yMd().add_Hm()
               onDateSelected: onChangedHandler,
               selectedDate: field.value,
               enabled: enabled,

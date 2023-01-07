@@ -12,19 +12,19 @@ class Event {
   String azione;
   DateTime data;
   String fasciaOraria;
-  String altro;
+  String? altro;
 
   Event(
       {required this.nomePaziente,
       required this.azione,
       required this.data,
       required this.fasciaOraria,
-      required this.altro});
+      this.altro});
 
   dynamic toJson() => {
         'Nome Paziente': nomePaziente,
-        'azione': azione,
-        'data': DateFormat.yMd().format(data),
+        'Azione': azione,
+        'Data': DateFormat.yMd().format(data),
         'Fascia Oraria': fasciaOraria,
         'Altro': altro
       };

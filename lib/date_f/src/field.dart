@@ -66,7 +66,7 @@ class DateTimeField extends StatelessWidget {
     DateTime? lastDate,
   })  : initialDatePickerMode = null,
         mode = DateTimeFieldPickerMode.time,
-        dateFormat = DateFormat.Hm(), //DateFormat("dd.MM.yyyy")
+        dateFormat = DateFormat.yMd(), //DateFormat("dd.MM.yyyy")
         firstDate = firstDate ?? DateTime(2000),
         lastDate = lastDate ?? DateTime(2001),
         super(key: key);
@@ -286,7 +286,7 @@ DateFormat getDateFormatFromDateFieldPickerMode(DateTimeFieldPickerMode mode) {
     case DateTimeFieldPickerMode.date:
       return DateFormat.yMd();
     default:
-      return DateFormat.yMd().add_Hm();
+      return DateFormat.yMd().add_Hm(); //DateFormat.yMd().add_Hm()
   }
 }
 

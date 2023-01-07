@@ -57,7 +57,7 @@ class _MyCustomForm extends State<MyCustomForm> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'Immetti il nome del paziente';
                       }
                       return null;
                     },
@@ -74,7 +74,7 @@ class _MyCustomForm extends State<MyCustomForm> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'Scegli l\'azione';
                       }
                       return null;
                     },
@@ -94,10 +94,14 @@ class _MyCustomForm extends State<MyCustomForm> {
                             suffixIcon: Icon(Icons.event_note),
                             labelText: 'Data',
                           ),
+                          mode: DateTimeFieldPickerMode.date,
                           autovalidateMode: AutovalidateMode.always,
-                          validator: (DateTime? e) => (e?.day ?? 0) == 1
-                              ? 'Please not the first day'
-                              : null,
+                          validator: (DateTime? e) {
+                            if (e == null) {
+                              return 'Scegli la Data';
+                            }
+                            return null;
+                          },
                           onDateSelected: (DateTime value) {
                             selectedDate = value;
                             print(DateFormat.yMd().format(value));
@@ -117,12 +121,12 @@ class _MyCustomForm extends State<MyCustomForm> {
                       border: UnderlineInputBorder(),
                       labelText: 'Altro',
                     ),
-                    validator: (value) {
+                    /*validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter some text';
                       }
                       return null;
-                    },
+                    }, */
                   ),
                 ),
                 ElevatedButton(
@@ -136,7 +140,7 @@ class _MyCustomForm extends State<MyCustomForm> {
                           data: selectedDate!,
                           fasciaOraria: fasciaOraria,
                           altro: altro.text);
-                      Navigator.pop(context, nuovoEvento.toString());
+                      Navigator.pop(context, nuovoEvento);
                     }
                   },
                   child: const Text('Crea'),
