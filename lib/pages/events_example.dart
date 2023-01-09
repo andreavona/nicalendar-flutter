@@ -87,7 +87,7 @@ class _TableEventsExampleState extends State<TableEventsExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('TableCalendar - Events'),
+        title: Text('Calendario'),
       ),
       body: Column(
         children: [
@@ -128,19 +128,48 @@ class _TableEventsExampleState extends State<TableEventsExample> {
                   itemCount: value.length,
                   itemBuilder: (context, index) {
                     return Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 4.0,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: ListTile(
-                        onTap: () => print('${value[index]}'),
-                        title: Text('${value[index]}'),
-                      ),
-                    );
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 12.0,
+                          vertical: 4.0,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        child: ExpansionTile(
+                          //title: Text('${value[index].nomePaziente}'),
+                          title: RichText(
+                            text: TextSpan(
+                              text: '',
+                              style: DefaultTextStyle.of(context).style,
+                              children: <TextSpan>[
+                                TextSpan(
+                                    text: '${value[index].nomePaziente}',
+                                    style: new TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      decoration: value[index].barrato,
+                                    )),
+                              ],
+                            ),
+                          ),
+                          subtitle: Text('${value[index].terapia}'),
+                          controlAffinity: ListTileControlAffinity.leading,
+                          trailing: DeleteButton(
+                              evento: value[index],
+                              dates: _selectedEvents.value),
+                          children: <Widget>[
+                            ListTile(
+                                title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                    'Azione Richiesta: ${value[index].azione}'),
+                                Text('Orario: ${value[index].fasciaOraria}'),
+                                Text('Altro: ${value[index].altro}')
+                              ],
+                            )),
+                          ],
+                        ));
                   },
                 );
               },
@@ -197,6 +226,96 @@ class _SelectionButtonState extends State<SelectionButton> {
       ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text('$result')));
+    }
+  }
+}
+
+class DeleteButton extends StatefulWidget {
+  DeleteButton({super.key, required this.evento, required this.dates});
+  Event evento;
+  List<Event> dates;
+
+  @override
+  State<DeleteButton> createState() => _DeleteButtonState();
+}
+
+class _DeleteButtonState extends State<DeleteButton> {
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.delete),
+      tooltip: 'Cancella o Elimina Evento',
+      onPressed: () {
+        showInformationDialog(context);
+      },
+    );
+  }
+
+// A method that launches the SelectionScreen and awaits the result from
+// Navigator.pop.
+  Future<void> showInformationDialog(BuildContext context) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    final result = await showDialog(
+        context: context,
+        builder: (context) {
+          bool barra = false;
+          bool elimina = false;
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              content: Form(
+                  child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Barra Evento"),
+                      Checkbox(
+                          value: barra,
+                          onChanged: (checked) {
+                            setState(() {
+                              barra = checked!;
+                            });
+                          }),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Elimina Completamente \nEvento"),
+                      Checkbox(
+                          value: elimina,
+                          onChanged: (checked) {
+                            setState(() {
+                              elimina = checked!;
+                            });
+                          }),
+                    ],
+                  )
+                ],
+              )),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Okay'),
+                  onPressed: () {
+                    List<bool> decision = [barra, elimina];
+                    // Do something like updating SharedPreferences or User Settings etc.
+                    Navigator.of(context).pop(decision);
+                  },
+                ),
+              ],
+            );
+          });
+        });
+
+    if (result[1]) {
+      widget.dates.removeWhere(
+          (item) => item.nomePaziente == widget.evento.nomePaziente);
+    } else if (result[0]) {
+      widget.evento.barrato = TextDecoration.lineThrough;
+    } else {
+      widget.evento.barrato = TextDecoration.none;
     }
   }
 }

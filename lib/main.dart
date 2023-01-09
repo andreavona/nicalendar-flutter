@@ -43,30 +43,32 @@ class _StartPageState extends State<StartPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('TableCalendar Example'),
+        title: Text('NiCalendar'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 20.0),
             const SizedBox(height: 12.0),
             ElevatedButton(
-              child: Text('Range Selection'),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => TableRangeExample()),
-              ),
-            ),
-            const SizedBox(height: 12.0),
-            ElevatedButton(
-              child: Text('Events'),
+              child: Text('Calendario'),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => TableEventsExample()),
               ),
             ),
             const SizedBox(height: 20.0),
+            const SizedBox(height: 12.0),
+            ElevatedButton(
+              child: Text('Pagina Admin'),
+              onPressed: () {},
+            ),
+            const SizedBox(height: 20.0),
+            const SizedBox(height: 12.0),
+            ElevatedButton(
+              child: Text('Ricerca Evento'),
+              onPressed: () {},
+            ),
           ],
         ),
       ),

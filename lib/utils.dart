@@ -3,26 +3,34 @@
 
 import 'dart:collection';
 
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 /// Example event class.
 class Event {
   String nomePaziente;
+  String terapia;
   String azione;
   DateTime data;
   String fasciaOraria;
   String? altro;
+  bool cancellato;
+  TextDecoration? barrato;
 
   Event(
       {required this.nomePaziente,
+      required this.terapia,
       required this.azione,
       required this.data,
       required this.fasciaOraria,
-      this.altro});
+      this.altro,
+      required this.cancellato,
+      this.barrato});
 
   dynamic toJson() => {
         'Nome Paziente': nomePaziente,
+        'Tipo di Azione': terapia,
         'Azione': azione,
         'Data': DateFormat.yMd().format(data),
         'Fascia Oraria': fasciaOraria,

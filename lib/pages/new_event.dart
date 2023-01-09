@@ -9,6 +9,16 @@ import '../utils.dart';
 const List<String> orari = <String>['Mattina', 'Pomeriggio'];
 String fasciaOraria = 'Mattina';
 
+const List<String> terapie = <String>[
+  'Terapia/Controlli Clinici',
+  'Videat',
+  'Terapia Educazionale',
+  'Chiamate',
+  'Esami Diagnostici/Strumentali',
+  'Altro'
+];
+String primaTerapia = 'Terapia/Controlli Clinici';
+
 class MyCustomForm extends StatefulWidget {
   const MyCustomForm({super.key});
 
@@ -23,6 +33,7 @@ class _MyCustomForm extends State<MyCustomForm> {
   final azione = TextEditingController();
   final altro = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final _formKey2 = GlobalKey<FormState>();
   late Event nuovoEvento;
 
   @override
@@ -63,6 +74,7 @@ class _MyCustomForm extends State<MyCustomForm> {
                     },
                   ),
                 ),
+                DropdownButtonOrari(list: terapie, firstItem: primaTerapia),
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
@@ -84,6 +96,7 @@ class _MyCustomForm extends State<MyCustomForm> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
                   child: Form(
+                    key: _formKey2,
                     child: Column(
                       children: <Widget>[
                         DateTimeFormField(
@@ -95,7 +108,7 @@ class _MyCustomForm extends State<MyCustomForm> {
                             labelText: 'Data',
                           ),
                           mode: DateTimeFieldPickerMode.date,
-                          autovalidateMode: AutovalidateMode.always,
+                          //autovalidateMode: AutovalidateMode.always,
                           validator: (DateTime? e) {
                             if (e == null) {
                               return 'Scegli la Data';
@@ -111,7 +124,7 @@ class _MyCustomForm extends State<MyCustomForm> {
                     ),
                   ),
                 ),
-                DropdownButtonExample(),
+                DropdownButtonOrari(list: orari, firstItem: fasciaOraria),
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
@@ -131,15 +144,18 @@ class _MyCustomForm extends State<MyCustomForm> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {
+                    if (_formKey.currentState!.validate() &&
+                        _formKey2.currentState!.validate()) {
                       // If the form is valid, display a snackbar. In the real world,
                       // you'd often call a server or save the information in a database.
                       Event nuovoEvento = Event(
                           nomePaziente: nomeController.text,
+                          terapia: primaTerapia,
                           azione: azione.text,
                           data: selectedDate!,
                           fasciaOraria: fasciaOraria,
-                          altro: altro.text);
+                          altro: altro.text,
+                          cancellato: false);
                       Navigator.pop(context, nuovoEvento);
                     }
                   },
@@ -150,29 +166,36 @@ class _MyCustomForm extends State<MyCustomForm> {
   }
 }
 
-class DropdownButtonExample extends StatefulWidget {
-  const DropdownButtonExample({super.key});
+class DropdownButtonOrari extends StatefulWidget {
+  DropdownButtonOrari({super.key, required this.list, required this.firstItem});
+  final List<String> list;
+  String firstItem;
 
   @override
-  State<DropdownButtonExample> createState() => _DropdownButtonExampleState();
+  State<DropdownButtonOrari> createState() => _DropdownButtonOrariState();
 }
 
-class _DropdownButtonExampleState extends State<DropdownButtonExample> {
-  String dropdownValue = orari.first;
+class _DropdownButtonOrariState extends State<DropdownButtonOrari> {
+  //String dropdownValue = orari.first;
 
   @override
   Widget build(BuildContext context) {
     return DropdownButton<String>(
-      value: dropdownValue,
+      value: widget.firstItem,
       icon: const Icon(Icons.arrow_downward),
       onChanged: (String? value) {
         // This is called when the user selects an item.
         setState(() {
-          dropdownValue = value!;
-          fasciaOraria = value;
+          widget.firstItem = value!;
+          //fasciaOraria = value;
+          if (widget.list.contains('Mattina')) {
+            fasciaOraria = value;
+          } else {
+            primaTerapia = value;
+          }
         });
       },
-      items: orari.map<DropdownMenuItem<String>>((String value) {
+      items: widget.list.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(value),
