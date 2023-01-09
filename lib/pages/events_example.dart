@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'new_event.dart';
 
 import '../utils.dart';
+import '../lib_table_calendar/table_calendar.dart';
 
 class TableEventsExample extends StatefulWidget {
   @override
@@ -13,7 +13,8 @@ class TableEventsExample extends StatefulWidget {
 }
 
 class _TableEventsExampleState extends State<TableEventsExample> {
-  late ValueNotifier<List<Event>> _selectedEvents;
+  late ValueNotifier<List<Event>> _selectedEventsMattina;
+  late ValueNotifier<List<Event>> _selectedEventsPomeriggio;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
       .toggledOff; // Can be toggled on/off by longpressing a date
@@ -27,27 +28,29 @@ class _TableEventsExampleState extends State<TableEventsExample> {
     super.initState();
 
     _selectedDay = _focusedDay;
-    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+    _selectedEventsMattina =
+        ValueNotifier(_getEventsForDay(_selectedDay!, 'Mattina'));
+    _selectedEventsPomeriggio =
+        ValueNotifier(_getEventsForDay(_selectedDay!, 'Pomeriggio'));
   }
 
   @override
   void dispose() {
-    _selectedEvents.dispose();
+    _selectedEventsMattina.dispose();
+    _selectedEventsPomeriggio.dispose();
     super.dispose();
   }
 
-  List<Event> _getEventsForDay(DateTime day) {
+  List<Event> _getEventsForDay(DateTime day, String fasciaOraria) {
     // Implementation example
-    return kEvents[day] ?? [];
-  }
-
-  List<Event> _getEventsForRange(DateTime start, DateTime end) {
-    // Implementation example
-    final days = daysInRange(start, end);
-
-    return [
-      for (final d in days) ..._getEventsForDay(d),
-    ];
+    if (fasciaOraria != null || fasciaOraria != '') {
+      return kEvents[day]
+              ?.where((element) => element.fasciaOraria == fasciaOraria)
+              .toList() ??
+          [];
+    } else {
+      return kEvents[day] ?? [];
+    }
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
@@ -60,31 +63,18 @@ class _TableEventsExampleState extends State<TableEventsExample> {
         _rangeSelectionMode = RangeSelectionMode.toggledOff;
       });
 
-      _selectedEvents.value = _getEventsForDay(selectedDay);
-    }
-  }
-
-  void _onRangeSelected(DateTime? start, DateTime? end, DateTime focusedDay) {
-    setState(() {
-      _selectedDay = null;
-      _focusedDay = focusedDay;
-      _rangeStart = start;
-      _rangeEnd = end;
-      _rangeSelectionMode = RangeSelectionMode.toggledOn;
-    });
-
-    // `start` or `end` could be null
-    if (start != null && end != null) {
-      _selectedEvents.value = _getEventsForRange(start, end);
-    } else if (start != null) {
-      _selectedEvents.value = _getEventsForDay(start);
-    } else if (end != null) {
-      _selectedEvents.value = _getEventsForDay(end);
+      _selectedEventsMattina.value = _getEventsForDay(selectedDay, 'Mattina');
+      _selectedEventsPomeriggio.value =
+          _getEventsForDay(selectedDay, 'Pomeriggio');
     }
   }
 
   void refresh() {
-    setState(() {});
+    setState(() {
+      _selectedEventsMattina.value = _getEventsForDay(_selectedDay!, 'Mattina');
+      _selectedEventsPomeriggio.value =
+          _getEventsForDay(_selectedDay!, 'Pomeriggio');
+    });
   }
 
   @override
@@ -111,7 +101,6 @@ class _TableEventsExampleState extends State<TableEventsExample> {
               outsideDaysVisible: false,
             ),
             onDaySelected: _onDaySelected,
-            onRangeSelected: _onRangeSelected,
             onFormatChanged: (format) {
               if (_calendarFormat != format) {
                 setState(() {
@@ -128,7 +117,7 @@ class _TableEventsExampleState extends State<TableEventsExample> {
               notifyParent: refresh), // pulsante aggiungi eventi
           Expanded(
             child: ValueListenableBuilder<List<Event>>(
-              valueListenable: _selectedEvents,
+              valueListenable: _selectedEventsMattina,
               builder: (context, value, _) {
                 return ListView.builder(
                   itemCount: value.length,
@@ -163,7 +152,7 @@ class _TableEventsExampleState extends State<TableEventsExample> {
                           controlAffinity: ListTileControlAffinity.leading,
                           trailing: DeleteButton(
                               evento: value[index],
-                              dates: _selectedEvents.value),
+                              dates: _selectedEventsMattina.value),
                           children: <Widget>[
                             ListTile(
                                 title: Column(
@@ -182,6 +171,62 @@ class _TableEventsExampleState extends State<TableEventsExample> {
               },
             ),
           ),
+          Expanded(
+            child: ValueListenableBuilder<List<Event>>(
+              valueListenable: _selectedEventsPomeriggio,
+              builder: (context, value, _) {
+                return ListView.builder(
+                  itemCount: value.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 12.0,
+                          vertical: 4.0,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        child: ExpansionTile(
+                          //title: Text('${value[index].nomePaziente}'),
+                          title: RichText(
+                            text: TextSpan(
+                              text: '',
+                              style: DefaultTextStyle.of(context).style,
+                              children: <TextSpan>[
+                                TextSpan(
+                                    text:
+                                        '${value[index].nomePaziente} ${value[index].cognomePaziente}',
+                                    style: new TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      decoration: value[index].barrato,
+                                    )),
+                              ],
+                            ),
+                          ),
+                          subtitle: Text('${value[index].terapia}'),
+                          controlAffinity: ListTileControlAffinity.leading,
+                          trailing: DeleteButton(
+                              evento: value[index],
+                              dates: _selectedEventsPomeriggio.value),
+                          children: <Widget>[
+                            ListTile(
+                                title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                    'Azione Richiesta: ${value[index].azione}'),
+                                Text('Orario: ${value[index].fasciaOraria}'),
+                                Text('Altro: ${value[index].altro}')
+                              ],
+                            )),
+                          ],
+                        ));
+                  },
+                );
+              },
+            ),
+          )
         ],
       ),
     );
