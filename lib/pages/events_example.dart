@@ -119,7 +119,7 @@ class _TableEventsExampleState extends State<TableEventsExample> {
               _focusedDay = focusedDay;
             },
           ),
-          SelectionButton(), // pulsante aggiungi eventi
+          SelectionButton(initialDate: _focusedDay), // pulsante aggiungi eventi
           Expanded(
             child: ValueListenableBuilder<List<Event>>(
               valueListenable: _selectedEvents,
@@ -182,7 +182,8 @@ class _TableEventsExampleState extends State<TableEventsExample> {
 }
 
 class SelectionButton extends StatefulWidget {
-  const SelectionButton({super.key});
+  const SelectionButton({super.key, required this.initialDate});
+  final DateTime initialDate;
 
   @override
   State<SelectionButton> createState() => _SelectionButtonState();
@@ -207,7 +208,8 @@ class _SelectionButtonState extends State<SelectionButton> {
     // Navigator.pop on the Selection Screen.
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const MyCustomForm()),
+      MaterialPageRoute(
+          builder: (context) => MyCustomForm(initialValue: widget.initialDate)),
     );
 
     // When a BuildContext is used from a StatefulWidget, the mounted property

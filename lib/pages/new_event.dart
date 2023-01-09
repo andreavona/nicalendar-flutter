@@ -20,7 +20,8 @@ const List<String> terapie = <String>[
 String primaTerapia = 'Terapia/Controlli Clinici';
 
 class MyCustomForm extends StatefulWidget {
-  const MyCustomForm({super.key});
+  const MyCustomForm({super.key, required this.initialValue});
+  final DateTime initialValue;
 
   @override
   _MyCustomForm createState() {
@@ -108,6 +109,7 @@ class _MyCustomForm extends State<MyCustomForm> {
                             labelText: 'Data',
                           ),
                           mode: DateTimeFieldPickerMode.date,
+                          initialValue: widget.initialValue,
                           //autovalidateMode: AutovalidateMode.always,
                           validator: (DateTime? e) {
                             if (e == null) {
@@ -146,6 +148,7 @@ class _MyCustomForm extends State<MyCustomForm> {
                   onPressed: () {
                     if (_formKey.currentState!.validate() &&
                         _formKey2.currentState!.validate()) {
+                      selectedDate ??= widget.initialValue;
                       // If the form is valid, display a snackbar. In the real world,
                       // you'd often call a server or save the information in a database.
                       Event nuovoEvento = Event(
