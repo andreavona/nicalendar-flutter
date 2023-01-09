@@ -31,6 +31,7 @@ class MyCustomForm extends StatefulWidget {
 
 class _MyCustomForm extends State<MyCustomForm> {
   final nomeController = TextEditingController();
+  final cognomeController = TextEditingController();
   final azione = TextEditingController();
   final altro = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -70,6 +71,23 @@ class _MyCustomForm extends State<MyCustomForm> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Immetti il nome del paziente';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                  child: TextFormField(
+                    controller: cognomeController,
+                    decoration: const InputDecoration(
+                      border: UnderlineInputBorder(),
+                      labelText: 'Cognome Paziente',
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Immetti il cognome del paziente';
                       }
                       return null;
                     },
@@ -136,12 +154,6 @@ class _MyCustomForm extends State<MyCustomForm> {
                       border: UnderlineInputBorder(),
                       labelText: 'Altro',
                     ),
-                    /*validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
-                      }
-                      return null;
-                    }, */
                   ),
                 ),
                 ElevatedButton(
@@ -152,7 +164,8 @@ class _MyCustomForm extends State<MyCustomForm> {
                       // If the form is valid, display a snackbar. In the real world,
                       // you'd often call a server or save the information in a database.
                       Event nuovoEvento = Event(
-                          nomePaziente: nomeController.text,
+                          nomePaziente: nomeController.text.capitalize(),
+                          cognomePaziente: cognomeController.text.capitalize(),
                           terapia: primaTerapia,
                           azione: azione.text,
                           data: selectedDate!,
@@ -204,6 +217,27 @@ class _DropdownButtonOrariState extends State<DropdownButtonOrari> {
           child: Text(value),
         );
       }).toList(),
+    );
+  }
+}
+
+class AutocompleteTextField extends StatelessWidget {
+  const AutocompleteTextField({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Autocomplete<String>(
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text == '') {
+          return const Iterable<String>.empty();
+        }
+        return kOptions.where((String option) {
+          return option.contains(textEditingValue.text.toLowerCase());
+        });
+      },
+      onSelected: (String selection) {
+        debugPrint('You just selected $selection');
+      },
     );
   }
 }

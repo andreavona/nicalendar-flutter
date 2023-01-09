@@ -83,6 +83,10 @@ class _TableEventsExampleState extends State<TableEventsExample> {
     }
   }
 
+  void refresh() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,7 +123,9 @@ class _TableEventsExampleState extends State<TableEventsExample> {
               _focusedDay = focusedDay;
             },
           ),
-          SelectionButton(initialDate: _focusedDay), // pulsante aggiungi eventi
+          SelectionButton(
+              initialDate: _focusedDay,
+              notifyParent: refresh), // pulsante aggiungi eventi
           Expanded(
             child: ValueListenableBuilder<List<Event>>(
               valueListenable: _selectedEvents,
@@ -144,7 +150,8 @@ class _TableEventsExampleState extends State<TableEventsExample> {
                               style: DefaultTextStyle.of(context).style,
                               children: <TextSpan>[
                                 TextSpan(
-                                    text: '${value[index].nomePaziente}',
+                                    text:
+                                        '${value[index].nomePaziente} ${value[index].cognomePaziente}',
                                     style: new TextStyle(
                                       fontWeight: FontWeight.bold,
                                       decoration: value[index].barrato,
@@ -182,8 +189,10 @@ class _TableEventsExampleState extends State<TableEventsExample> {
 }
 
 class SelectionButton extends StatefulWidget {
-  const SelectionButton({super.key, required this.initialDate});
+  const SelectionButton(
+      {super.key, required this.initialDate, required this.notifyParent});
   final DateTime initialDate;
+  final Function() notifyParent;
 
   @override
   State<SelectionButton> createState() => _SelectionButtonState();
@@ -219,12 +228,14 @@ class _SelectionButtonState extends State<SelectionButton> {
     // After the Selection Screen returns a result, hide any previous snackbars
     // and show the new result.
     if (result != null) {
+      //setState(() {});
       //kEvents[result.data] = result;
       if (kEvents[result.data] == null) {
         final growableList = <Event>[];
         kEvents[result.data] = growableList;
       }
       kEvents[result.data]!.add(result);
+      widget.notifyParent();
       ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text('$result')));

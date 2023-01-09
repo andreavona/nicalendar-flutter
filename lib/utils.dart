@@ -10,6 +10,7 @@ import 'package:table_calendar/table_calendar.dart';
 /// Example event class.
 class Event {
   String nomePaziente;
+  String cognomePaziente;
   String terapia;
   String azione;
   DateTime data;
@@ -20,6 +21,7 @@ class Event {
 
   Event(
       {required this.nomePaziente,
+      required this.cognomePaziente,
       required this.terapia,
       required this.azione,
       required this.data,
@@ -82,3 +84,11 @@ List<DateTime> daysInRange(DateTime first, DateTime last) {
 final kToday = DateTime.now();
 final kFirstDay = DateTime(1900, 1, 1);
 final kLastDay = DateTime(3000, 12, 31);
+
+List<String> kOptions = <String>[];
+
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
+  }
+}
