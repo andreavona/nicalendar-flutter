@@ -20,8 +20,9 @@ const List<String> terapie = <String>[
 String primaTerapia = 'Terapia/Controlli Clinici';
 
 class MyCustomForm extends StatefulWidget {
-  const MyCustomForm({super.key, required this.initialValue});
+  MyCustomForm({super.key, required this.initialValue, this.eventToUpdate});
   final DateTime initialValue;
+  Event? eventToUpdate;
 
   @override
   _MyCustomForm createState() {
@@ -30,13 +31,27 @@ class MyCustomForm extends StatefulWidget {
 }
 
 class _MyCustomForm extends State<MyCustomForm> {
-  final nomeController = TextEditingController();
-  final cognomeController = TextEditingController();
-  final azione = TextEditingController();
-  final altro = TextEditingController();
+  late final nomeController = TextEditingController(text: nome);
+  late final cognomeController = TextEditingController(text: cognome);
+  late final azione = TextEditingController(text: azioneToUpdate);
+  late final altro = TextEditingController(text: altroToUpdate);
   final _formKey = GlobalKey<FormState>();
   final _formKey2 = GlobalKey<FormState>();
   late Event nuovoEvento;
+  String? nome;
+  String? cognome;
+  String? azioneToUpdate;
+  String? altroToUpdate;
+
+  @override
+  void initState() {
+    nome = widget.eventToUpdate?.nomePaziente;
+    cognome = widget.eventToUpdate?.cognomePaziente;
+    azioneToUpdate = widget.eventToUpdate?.azione;
+    altroToUpdate = widget.eventToUpdate?.altro;
+    primaTerapia = 'Terapia/Controlli Clinici';
+    fasciaOraria = 'Mattina';
+  }
 
   @override
   void dispose() {
@@ -45,6 +60,16 @@ class _MyCustomForm extends State<MyCustomForm> {
     azione.dispose();
     altro.dispose();
     super.dispose();
+  }
+
+  void barratoFunction(bool barra) {
+    setState(() {
+      widget.eventToUpdate!.barrato = barra;
+    });
+  }
+
+  void eliminaEvento() {
+    Navigator.pop(context, true);
   }
 
   @override
@@ -145,6 +170,7 @@ class _MyCustomForm extends State<MyCustomForm> {
                   ),
                 ),
                 DropdownButtonOrari(list: orari, firstItem: fasciaOraria),
+                // update part
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
@@ -155,7 +181,14 @@ class _MyCustomForm extends State<MyCustomForm> {
                       labelText: 'Altro',
                     ),
                   ),
-                ),
+                ), //if(widget.eventToUpdate!=null)
+                if (widget.eventToUpdate != null) ...[
+                  CheckBoxCustom(
+                    isChecked: widget.eventToUpdate!.barrato,
+                    barratoFunction: barratoFunction,
+                  ),
+                  DeleteButton(eliminaFunc: eliminaEvento)
+                ],
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate() &&
@@ -163,20 +196,34 @@ class _MyCustomForm extends State<MyCustomForm> {
                       selectedDate ??= widget.initialValue;
                       // If the form is valid, display a snackbar. In the real world,
                       // you'd often call a server or save the information in a database.
-                      Event nuovoEvento = Event(
-                          nomePaziente: nomeController.text.capitalize(),
-                          cognomePaziente: cognomeController.text.capitalize(),
-                          terapia: primaTerapia,
-                          azione: azione.text,
-                          data: selectedDate!,
-                          fasciaOraria: fasciaOraria,
-                          altro: altro.text,
-                          cancellato: false);
-                      Navigator.pop(context, nuovoEvento);
+                      if (widget.eventToUpdate == null) {
+                        widget.eventToUpdate = Event(
+                            nomePaziente: nomeController.text.capitalize(),
+                            cognomePaziente:
+                                cognomeController.text.capitalize(),
+                            terapia: primaTerapia,
+                            azione: azione.text,
+                            data: selectedDate!,
+                            fasciaOraria: fasciaOraria,
+                            altro: altro.text,
+                            barrato: false,
+                            cancellato: false);
+                      } else {
+                        widget.eventToUpdate!.nomePaziente =
+                            nomeController.text.capitalize();
+                        widget.eventToUpdate!.cognomePaziente =
+                            cognomeController.text.capitalize();
+                        widget.eventToUpdate!.terapia = primaTerapia;
+                        widget.eventToUpdate!.azione = azione.text;
+                        widget.eventToUpdate!.data = selectedDate!;
+                        widget.eventToUpdate!.fasciaOraria = fasciaOraria;
+                        widget.eventToUpdate!.altro = altro.text;
+                      }
+                      Navigator.pop(context, widget.eventToUpdate);
                     }
                   },
-                  child: const Text('Crea'),
-                )
+                  child: const Text('Aggiungi'),
+                ),
               ],
             )));
   }
@@ -221,23 +268,98 @@ class _DropdownButtonOrariState extends State<DropdownButtonOrari> {
   }
 }
 
-class AutocompleteTextField extends StatelessWidget {
-  const AutocompleteTextField({super.key});
+class CheckBoxCustom extends StatefulWidget {
+  CheckBoxCustom(
+      {super.key, required this.isChecked, required this.barratoFunction});
+  bool isChecked;
+  Function barratoFunction;
 
   @override
+  State<CheckBoxCustom> createState() => _CheckBoxCustomState();
+}
+
+class _CheckBoxCustomState extends State<CheckBoxCustom> {
+  @override
   Widget build(BuildContext context) {
-    return Autocomplete<String>(
-      optionsBuilder: (TextEditingValue textEditingValue) {
-        if (textEditingValue.text == '') {
-          return const Iterable<String>.empty();
-        }
-        return kOptions.where((String option) {
-          return option.contains(textEditingValue.text.toLowerCase());
+    return CheckboxListTile(
+      title: Text('Barra senza eliminare l\'elemento'),
+      checkColor: Color.fromARGB(255, 255, 255, 255),
+      controlAffinity: ListTileControlAffinity.leading,
+      value: widget.isChecked,
+      onChanged: (bool? value) {
+        setState(() {
+          widget.isChecked = value!;
+          widget.barratoFunction(value);
         });
       },
-      onSelected: (String selection) {
-        debugPrint('You just selected $selection');
+    );
+  }
+}
+
+class DeleteButton extends StatefulWidget {
+  DeleteButton({super.key, required this.eliminaFunc});
+  Function eliminaFunc;
+
+  @override
+  State<DeleteButton> createState() => _DeleteButtonState();
+}
+
+class _DeleteButtonState extends State<DeleteButton> {
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      child: Text('Elimina Evento'),
+      style: ElevatedButton.styleFrom(backgroundColor: Colors.red[300]),
+      onPressed: () {
+        showInformationDialog(context);
       },
     );
+  }
+
+// A method that launches the SelectionScreen and awaits the result from
+// Navigator.pop.
+  Future<void> showInformationDialog(BuildContext context) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    final result = await showDialog(
+        context: context,
+        builder: (context) {
+          bool elimina = false;
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              content: Form(
+                  child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Elimina Completamente \nEvento"),
+                      Checkbox(
+                          value: elimina,
+                          onChanged: (checked) {
+                            setState(() {
+                              elimina = checked!;
+                            });
+                          }),
+                    ],
+                  )
+                ],
+              )),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Fatto'),
+                  onPressed: () {
+                    // Do something like updating SharedPreferences or User Settings etc.
+                    Navigator.of(context).pop(elimina);
+                  },
+                ),
+              ],
+            );
+          });
+        });
+    if (result) {
+      widget.eliminaFunc();
+    }
   }
 }

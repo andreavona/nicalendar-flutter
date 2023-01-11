@@ -112,138 +112,175 @@ class _TableEventsExampleState extends State<TableEventsExample> {
               _focusedDay = focusedDay;
             },
           ),
-          SelectionButton(
+          NewEventButton(
               initialDate: _focusedDay,
               notifyParent: refresh), // pulsante aggiungi eventi
-          Expanded(
-            child: ValueListenableBuilder<List<Event>>(
-              valueListenable: _selectedEventsMattina,
-              builder: (context, value, _) {
-                return ListView.builder(
-                  itemCount: value.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 12.0,
-                          vertical: 4.0,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        child: ExpansionTile(
-                          //title: Text('${value[index].nomePaziente}'),
-                          title: RichText(
-                            text: TextSpan(
-                              text: '',
-                              style: DefaultTextStyle.of(context).style,
-                              children: <TextSpan>[
-                                TextSpan(
-                                    text:
-                                        '${value[index].nomePaziente} ${value[index].cognomePaziente}',
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      decoration: value[index].barrato,
+
+          const SizedBox(height: 12.0),
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
+              Widget>[
+            if (_selectedEventsMattina.value.isNotEmpty) ...[
+              ExpansionTile(
+                title: Text('Azioni Mattina'),
+                subtitle: Text('Terapie, controlli, chiamate, ecc.'),
+                children: <Widget>[
+                  Container(
+                    child: ValueListenableBuilder<List<Event>>(
+                      valueListenable: _selectedEventsMattina,
+                      builder: (context, value, _) {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: value.length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 12.0,
+                                  vertical: 4.0,
+                                ),
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                                child: ExpansionTile(
+                                  //title: Text('${value[index].nomePaziente}'),
+                                  title: RichText(
+                                    text: TextSpan(
+                                      text: '',
+                                      style: DefaultTextStyle.of(context).style,
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                            text:
+                                                '${value[index].nomePaziente} ${value[index].cognomePaziente}',
+                                            style: new TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              decoration: value[index].barrato
+                                                  ? TextDecoration.lineThrough
+                                                  : null, // variable > 10 ? Colors.redAccent : Colors.green
+                                            )),
+                                      ],
+                                    ),
+                                  ),
+                                  subtitle: Text('${value[index].terapia}'),
+                                  controlAffinity:
+                                      ListTileControlAffinity.leading,
+                                  trailing: UpdateButton(
+                                      evento: value[index],
+                                      dates: _selectedEventsMattina.value,
+                                      initialDate: _focusedDay,
+                                      notifyParent: refresh),
+                                  children: <Widget>[
+                                    ListTile(
+                                        title: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(
+                                            'Azione Richiesta: ${value[index].azione}'),
+                                        Text(
+                                            'Orario: ${value[index].fasciaOraria}'),
+                                        Text('Altro: ${value[index].altro}')
+                                      ],
                                     )),
-                              ],
-                            ),
-                          ),
-                          subtitle: Text('${value[index].terapia}'),
-                          controlAffinity: ListTileControlAffinity.leading,
-                          trailing: DeleteButton(
-                              evento: value[index],
-                              dates: _selectedEventsMattina.value),
-                          children: <Widget>[
-                            ListTile(
-                                title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                    'Azione Richiesta: ${value[index].azione}'),
-                                Text('Orario: ${value[index].fasciaOraria}'),
-                                Text('Altro: ${value[index].altro}')
-                              ],
-                            )),
-                          ],
-                        ));
-                  },
-                );
-              },
-            ),
-          ),
-          Expanded(
-            child: ValueListenableBuilder<List<Event>>(
-              valueListenable: _selectedEventsPomeriggio,
-              builder: (context, value, _) {
-                return ListView.builder(
-                  itemCount: value.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 12.0,
-                          vertical: 4.0,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        child: ExpansionTile(
-                          //title: Text('${value[index].nomePaziente}'),
-                          title: RichText(
-                            text: TextSpan(
-                              text: '',
-                              style: DefaultTextStyle.of(context).style,
-                              children: <TextSpan>[
-                                TextSpan(
-                                    text:
-                                        '${value[index].nomePaziente} ${value[index].cognomePaziente}',
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      decoration: value[index].barrato,
+                                  ],
+                                ));
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            if (_selectedEventsPomeriggio.value.isNotEmpty) ...[
+              ExpansionTile(
+                title: Text('Azioni Pomeriggio'),
+                subtitle: Text('Terapie, controlli, chiamate, ecc.'),
+                children: <Widget>[
+                  Container(
+                    child: ValueListenableBuilder<List<Event>>(
+                      valueListenable: _selectedEventsPomeriggio,
+                      builder: (context, value, _) {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: value.length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 12.0,
+                                  vertical: 4.0,
+                                ),
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                                child: ExpansionTile(
+                                  //title: Text('${value[index].nomePaziente}'),
+                                  title: RichText(
+                                    text: TextSpan(
+                                      text: '',
+                                      style: DefaultTextStyle.of(context).style,
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                            text:
+                                                '${value[index].nomePaziente} ${value[index].cognomePaziente}',
+                                            style: new TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              decoration: value[index].barrato
+                                                  ? TextDecoration.lineThrough
+                                                  : TextDecoration.none,
+                                            )),
+                                      ],
+                                    ),
+                                  ),
+                                  subtitle: Text('${value[index].terapia}'),
+                                  controlAffinity:
+                                      ListTileControlAffinity.leading,
+                                  trailing: UpdateButton(
+                                      evento: value[index],
+                                      dates: _selectedEventsPomeriggio.value,
+                                      initialDate: _focusedDay,
+                                      notifyParent: refresh),
+                                  children: <Widget>[
+                                    ListTile(
+                                        title: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(
+                                            'Azione Richiesta: ${value[index].azione}'),
+                                        Text(
+                                            'Orario: ${value[index].fasciaOraria}'),
+                                        Text('Altro: ${value[index].altro}')
+                                      ],
                                     )),
-                              ],
-                            ),
-                          ),
-                          subtitle: Text('${value[index].terapia}'),
-                          controlAffinity: ListTileControlAffinity.leading,
-                          trailing: DeleteButton(
-                              evento: value[index],
-                              dates: _selectedEventsPomeriggio.value),
-                          children: <Widget>[
-                            ListTile(
-                                title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                    'Azione Richiesta: ${value[index].azione}'),
-                                Text('Orario: ${value[index].fasciaOraria}'),
-                                Text('Altro: ${value[index].altro}')
-                              ],
-                            )),
-                          ],
-                        ));
-                  },
-                );
-              },
-            ),
-          )
+                                  ],
+                                ));
+                          },
+                        );
+                      },
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ])
         ],
       ),
     );
   }
 }
 
-class SelectionButton extends StatefulWidget {
-  const SelectionButton(
+class NewEventButton extends StatefulWidget {
+  const NewEventButton(
       {super.key, required this.initialDate, required this.notifyParent});
   final DateTime initialDate;
   final Function() notifyParent;
 
   @override
-  State<SelectionButton> createState() => _SelectionButtonState();
+  State<NewEventButton> createState() => _NewEventButtonState();
 }
 
-class _SelectionButtonState extends State<SelectionButton> {
+class _NewEventButtonState extends State<NewEventButton> {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
@@ -288,22 +325,39 @@ class _SelectionButtonState extends State<SelectionButton> {
   }
 }
 
-class DeleteButton extends StatefulWidget {
-  DeleteButton({super.key, required this.evento, required this.dates});
+class UpdateButton extends StatefulWidget {
+  UpdateButton(
+      {super.key,
+      required this.evento,
+      required this.dates,
+      required this.initialDate,
+      required this.notifyParent});
   Event evento;
   List<Event> dates;
+  final DateTime initialDate;
+  final Function() notifyParent;
 
   @override
-  State<DeleteButton> createState() => _DeleteButtonState();
+  State<UpdateButton> createState() => _UpdateButtonState();
 }
 
-class _DeleteButtonState extends State<DeleteButton> {
+class _UpdateButtonState extends State<UpdateButton> {
+  @override
+  void initState() {
+    super.initState();
+
+    kEvents[widget.initialDate]!.remove(widget.evento);
+  }
+
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.delete),
+      icon: const Icon(Icons.edit),
       tooltip: 'Cancella o Elimina Evento',
       onPressed: () {
+        setState(() {
+          kEvents[widget.initialDate]!.remove(widget.evento);
+        });
         showInformationDialog(context);
       },
     );
@@ -314,66 +368,26 @@ class _DeleteButtonState extends State<DeleteButton> {
   Future<void> showInformationDialog(BuildContext context) async {
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the Selection Screen.
-    final result = await showDialog(
-        context: context,
-        builder: (context) {
-          bool barra = false;
-          bool elimina = false;
-          return StatefulBuilder(builder: (context, setState) {
-            return AlertDialog(
-              content: Form(
-                  child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Barra Evento"),
-                      Checkbox(
-                          value: barra,
-                          onChanged: (checked) {
-                            setState(() {
-                              barra = checked!;
-                            });
-                          }),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Elimina Completamente \nEvento"),
-                      Checkbox(
-                          value: elimina,
-                          onChanged: (checked) {
-                            setState(() {
-                              elimina = checked!;
-                            });
-                          }),
-                    ],
-                  )
-                ],
-              )),
-              actions: <Widget>[
-                TextButton(
-                  child: Text('Okay'),
-                  onPressed: () {
-                    List<bool> decision = [barra, elimina];
-                    // Do something like updating SharedPreferences or User Settings etc.
-                    Navigator.of(context).pop(decision);
-                  },
-                ),
-              ],
-            );
-          });
-        });
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => MyCustomForm(
+              initialValue: widget.initialDate, eventToUpdate: widget.evento)),
+    );
 
-    if (result[1]) {
-      widget.dates.removeWhere(
-          (item) => item.nomePaziente == widget.evento.nomePaziente);
-    } else if (result[0]) {
-      widget.evento.barrato = TextDecoration.lineThrough;
+    if (result != null) {
+      if (!result) {
+        kEvents[result.data]!.add(result);
+        widget.notifyParent();
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text('$result')));
+      }
+      widget.notifyParent();
     } else {
-      widget.evento.barrato = TextDecoration.none;
+      kEvents[widget.initialDate]!.add(widget.evento);
     }
   }
 }

@@ -17,7 +17,7 @@ class Event {
   String fasciaOraria;
   String? altro;
   bool cancellato;
-  TextDecoration? barrato;
+  bool barrato;
 
   Event(
       {required this.nomePaziente,
@@ -28,7 +28,7 @@ class Event {
       required this.fasciaOraria,
       this.altro,
       required this.cancellato,
-      this.barrato});
+      required this.barrato});
 
   dynamic toJson() => {
         'Nome Paziente': nomePaziente,
